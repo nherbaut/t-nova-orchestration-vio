@@ -1,14 +1,14 @@
 [Unit]
 Description=Transcoding worker
 After=docker.service
-Requires=docker.service
-Requires=broker.service
+Requires=docker.service,broker.service
 
 [Service]
 TimeoutStartSec=0
-ExecStartPre=-/usr/bin/docker kill worker-%i
-ExecStartPre=-/usr/bin/docker rm worker-%i
+ExecStartPre=-/usr/bin/docker kill worker%i
+ExecStartPre=-/usr/bin/docker rm worker%i
 ExecStartPre=/usr/bin/docker pull nherbaut/worker
-ExecStart=/usr/bin/docker run --rm --name  worker-%i -e AMQP_PORT_5672_TCP_ADDR=`etcdctl get /services/viotech/broker/host`  nherbaut/worker
-ExecStop=/usr/bin/docker stop worker-%i
+ExecStart=/bin/bash -c '/usr/bin/docker run --name worker%i -e AMQP_PORT_5672_TCP_ADDR=`etcdctl get /services/viotech/broker/host`  nherbaut/worker'
+
+ExecStop=/usr/bin/docker stop worker%i
 
